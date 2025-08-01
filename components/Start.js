@@ -16,7 +16,6 @@ const Start = ({ navigation }) => {
       >
         <View style={styles.containerContent}>
           <Text style={styles.appTitle}>Chat App</Text>
-
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.textInput}
@@ -27,7 +26,6 @@ const Start = ({ navigation }) => {
               accessibilityLabel="Your username input"
               accessibilityHint="Type your desired username here"
             />
-
             <Text style={styles.chooseColorText}>Choose Background Color:</Text>
             <View style={styles.colorSelectionContainer}>
               {colors.map((color, index) => (
@@ -46,7 +44,6 @@ const Start = ({ navigation }) => {
                 />
               ))}
             </View>
-
             <TouchableOpacity
               style={styles.button}
               onPress={() => navigation.navigate('Chat', { name: name, backgroundColor: backgroundColor })}
