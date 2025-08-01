@@ -1,81 +1,146 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, KeyboardAvoidingView, Platform } from 'react-native';
-import { GiftedChat, Bubble } from 'react-native-gifted-chat';
+import { useState } from 'react';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, ImageBackground, KeyboardAvoidingView, Platform } from 'react-native';
 
-const Chat = ({ route, navigation }) => {
-  const { name, backgroundColor } = route.params;
+const Start = ({ navigation }) => {
+  const [name, setName] = useState('');
+  const [backgroundColor, setBackgroundColor] = useState('#757083');
 
-  const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    navigation.setOptions({ title: name });
-
-    setMessages([
-      {
-        _id: 1,
-        text: 'Hello developer',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
-        },
-      },
-      {
-        _id: 2,
-        text: 'You have entered the chat.',
-        createdAt: new Date(),
-        system: true,
-      },
-    ]);
-  }, [name, navigation]);
-
-  const onSend = (newMessages) => {
-    setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages));
-  };
-
-  const renderBubble = (props) => {
-    return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          right: {
-            backgroundColor: "#000",
-          },
-          left: {
-            backgroundColor: "#FFF",
-          }
-        }}
-      />
-    );
-  };
+  const colors = ['#090C08', '#474056', '#8A95A5', '#B9C6AE'];
 
   return (
-    <View style={[styles.fullScreenContainer, { backgroundColor: backgroundColor }]}>
+    <ImageBackground source={require('../assets/background-image.png')} style={styles.backgroundImage}>
       <KeyboardAvoidingView
         style={styles.keyboardAvoidingView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        enabled
       >
-        <GiftedChat
-          messages={messages}
-          onSend={messages => onSend(messages)}
-          user={{
-            _id: 1,
-          }}
-          renderBubble={renderBubble}
-        />
+        <View style={styles.containerContent}>
+          <Text style={styles.appTitle}>Chat App</Text>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textInput}
+              value={name}
+              onChangeText={setName}
+              placeholder='Type your username here'
+              accessible={true}
+              accessibilityLabel="Your username input"
+              accessibilityHint="Type your desired username here"
+            />
+
+            <Text style={styles.chooseColorText}>Choose Background Color:</Text>
+            <View style={styles.colorSelectionContainer}>
+              {colors.map((color, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.colorCircle,
+                    { backgroundColor: color },
+                    backgroundColor === color && styles.selectedColor
+                  ]}
+                  onPress={() => setBackgroundColor(color)}
+                  accessible={true}
+                  accessibilityLabel={`Color option: ${color}`}
+                  accessibilityHint={`Sets the chat background to ${color}. Currently ${backgroundColor === color ? 'selected' : 'not selected'}.`}
+                  accessibilityRole="button"
+                />
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('Chat', { name: name, backgroundColor: backgroundColor })}
+              accessible={true}
+              accessibilityLabel="Start Chatting"
+              accessibilityHint="Navigates to the chat screen with your chosen username and background color."
+              accessibilityRole="button"
+            >
+              <Text style={styles.buttonText}>Start Chatting</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </KeyboardAvoidingView>
-    </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  fullScreenContainer: {
+  backgroundImage: {
     flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
   },
   keyboardAvoidingView: {
     flex: 1,
+    width: '100%',
+  },
+  containerContent: {
+    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: '6%',
+  },
+  appTitle: {
+    fontSize: 45,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginTop: 60,
+    marginBottom: 20,
+  },
+  inputContainer: {
+    width: '88%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 5,
+    padding: 20,
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  textInput: {
+    width: '100%',
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#757083',
+    borderRadius: 5,
+    fontSize: 16,
+    fontWeight: '300',
+    color: '#757083',
+    marginBottom: 20,
+  },
+  chooseColorText: {
+    fontSize: 16,
+    fontWeight: '300',
+    color: '#757083',
+    marginBottom: 10,
+  },
+  colorSelectionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+    marginBottom: 20,
+  },
+  colorCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  selectedColor: {
+    borderColor: '#000000',
+    borderWidth: 2,
+  },
+  button: {
+    backgroundColor: '#757083',
+    padding: 15,
+    borderRadius: 5,
+    width: '100%',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 });
 
-export default Chat;
+export default Start;
