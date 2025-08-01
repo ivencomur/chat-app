@@ -1,48 +1,65 @@
 import { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, ImageBackground, KeyboardAvoidingView, Platform } from 'react-native';
 
 const Start = ({ navigation }) => {
   const [name, setName] = useState('');
-  const [backgroundColor, setBackgroundColor] = useState('#757083'); // Default background color
+  const [backgroundColor, setBackgroundColor] = useState('#757083');
 
-  const colors = ['#090C08', '#474056', '#8A95A5', '#B9C6AE']; // Predefined background colors
+  const colors = ['#090C08', '#474056', '#8A95A5', '#B9C6AE'];
 
   return (
     <ImageBackground source={require('../assets/background-image.png')} style={styles.backgroundImage}>
-      <View style={styles.container}>
-        <Text style={styles.appTitle}>Chat App</Text>
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        enabled
+      >
+        <View style={styles.containerContent}>
+          <Text style={styles.appTitle}>Chat App</Text>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={name}
-            onChangeText={setName}
-            placeholder='Type your username here'
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textInput}
+              value={name}
+              onChangeText={setName}
+              placeholder='Type your username here'
+              accessible={true}
+              accessibilityLabel="Your username input"
+              accessibilityHint="Type your desired username here"
+            />
 
-          <Text style={styles.chooseColorText}>Choose Background Color:</Text>
-          <View style={styles.colorSelectionContainer}>
-            {colors.map((color, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.colorCircle,
-                  { backgroundColor: color },
-                  backgroundColor === color && styles.selectedColor
-                ]}
-                onPress={() => setBackgroundColor(color)}
-              />
-            ))}
+            <Text style={styles.chooseColorText}>Choose Background Color:</Text>
+            <View style={styles.colorSelectionContainer}>
+              {colors.map((color, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.colorCircle,
+                    { backgroundColor: color },
+                    backgroundColor === color && styles.selectedColor
+                  ]}
+                  onPress={() => setBackgroundColor(color)}
+                  accessible={true}
+                  accessibilityLabel={`Color option: ${color}`}
+                  accessibilityHint={`Sets the chat background to ${color}. Currently ${backgroundColor === color ? 'selected' : 'not selected'}.`}
+                  accessibilityRole="button"
+                />
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('Chat', { name: name, backgroundColor: backgroundColor })}
+              accessible={true}
+              accessibilityLabel="Start Chatting"
+              accessibilityHint="Navigates to the chat screen with your chosen username and background color."
+              accessibilityRole="button"
+            >
+              <Text style={styles.buttonText}>Start Chatting</Text>
+            </TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('Chat', { name: name, backgroundColor: backgroundColor })}
-          >
-            <Text style={styles.buttonText}>Start Chatting</Text>
-          </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 };
@@ -53,7 +70,11 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     justifyContent: 'center',
   },
-  container: {
+  keyboardAvoidingView: {
+    flex: 1,
+    width: '100%',
+  },
+  containerContent: {
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',

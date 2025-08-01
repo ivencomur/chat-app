@@ -1,11 +1,9 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-// Import your screen components
 import Start from './components/Start';
 import Chat from './components/Chat';
 
-// Create the Stack Navigator object
 const Stack = createNativeStackNavigator();
 
 const App = () => {
