@@ -2,31 +2,25 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { StyleSheet, View, Text, KeyboardAvoidingView, Platform } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import 'react-native-safe-area-context';
-
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
 import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const Chat = ({ route, navigation }) => {
   const { name, backgroundColor } = route.params;
-
   const [messages, setMessages] = useState([]);
   const [db, setDb] = useState(null);
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     navigation.setOptions({ title: name });
-    
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
     const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
     const app = initializeApp(firebaseConfig);
     const firestoreDb = getFirestore(app);
     const firebaseAuth = getAuth(app);
-
     setDb(firestoreDb);
-
     const authenticate = async () => {
       try {
         if (initialAuthToken) {
@@ -38,9 +32,7 @@ const Chat = ({ route, navigation }) => {
         console.error("Firebase authentication error:", error);
       }
     };
-
     authenticate();
-
     const unsubscribeAuth = onAuthStateChanged(firebaseAuth, (user) => {
       if (user) {
         setUserId(user.uid);
@@ -48,16 +40,13 @@ const Chat = ({ route, navigation }) => {
         setUserId(null);
       }
     });
-
     return () => unsubscribeAuth();
   }, [name, navigation]);
 
   useEffect(() => {
     if (!db || !userId) return;
-
     const messagesCollectionRef = collection(db, `artifacts/${__app_id}/public/data/messages`);
     const q = query(messagesCollectionRef, orderBy('createdAt', 'desc'));
-
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const loadedMessages = snapshot.docs.map(doc => {
         const data = doc.data();
@@ -77,7 +66,6 @@ const Chat = ({ route, navigation }) => {
     }, (error) => {
       console.error("Error fetching messages:", error);
     });
-
     return () => unsubscribe();
   }, [db, userId]);
 
@@ -86,7 +74,6 @@ const Chat = ({ route, navigation }) => {
       console.warn("Firestore not initialized or user not authenticated. Cannot send message.");
       return;
     }
-
     const messageToSend = newMessages[0];
     try {
       await addDoc(collection(db, `artifacts/${__app_id}/public/data/messages`), {
@@ -109,10 +96,10 @@ const Chat = ({ route, navigation }) => {
         {...props}
         wrapperStyle={{
           right: {
-            backgroundColor: "#000",
+            backgroundColor: "#048673",
           },
           left: {
-            backgroundColor: "#FFF",
+            backgroundColor: "#ffffff",
           }
         }}
       />
@@ -149,4 +136,3 @@ const styles = StyleSheet.create({
 });
 
 export default Chat;
-

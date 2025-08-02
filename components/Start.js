@@ -3,9 +3,9 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, ImageBackground, K
 
 const Start = ({ navigation }) => {
   const [name, setName] = useState('');
-  const [backgroundColor, setBackgroundColor] = useState('#757083');
+  const [backgroundColor, setBackgroundColor] = useState('#048673');
 
-  const colors = ['#090C08', '#474056', '#8A95A5', '#B9C6AE'];
+  const colors = ['#090C08', '#048673', '#f88f1f', '#8A95A5'];
 
   return (
     <ImageBackground source={require('../assets/background-image.png')} style={styles.backgroundImage}>
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   appTitle: {
     fontSize: 45,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#048673',
     marginTop: 60,
     marginBottom: 20,
   },
