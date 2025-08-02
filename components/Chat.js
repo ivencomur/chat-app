@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { StyleSheet, View, Text, KeyboardAvoidingView, Platform } from 'react-native';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import 'react-native-safe-area-context';
 
 import { initializeApp } from 'firebase/app';
@@ -134,7 +134,7 @@ const Chat = ({ route, navigation }) => {
         showUserAvatar={true}
         renderUsernameOnMessage={true}
         renderChatFooter={() => (
-          Platform.OS === 'android' && <KeyboardAvoidingView behavior="height" />
+          Platform.OS === 'android' ? <View style={{ height: 20 }} /> : null
         )}
       />
       {Platform.OS === 'ios' && <KeyboardAvoidingView behavior="padding" />}
@@ -149,3 +149,4 @@ const styles = StyleSheet.create({
 });
 
 export default Chat;
+

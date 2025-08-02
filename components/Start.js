@@ -45,7 +45,7 @@ const Start = ({ navigation }) => {
               ))}
             </View>
             <TouchableOpacity
-              style={styles.button}
+              style={[styles.button, { backgroundColor: backgroundColor }]}
               onPress={() => navigation.navigate('Chat', { name: name, backgroundColor: backgroundColor })}
               accessible={true}
               accessibilityLabel="Start Chatting"
@@ -127,7 +127,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   button: {
-    backgroundColor: '#757083',
     padding: 15,
     borderRadius: 5,
     width: '100%',
