@@ -1,5 +1,5 @@
-import { NavigationContainer } => '@react-navigation/native';
-import { createNativeStackNavigator } => '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Start from './components/Start';
 import Chat from './components/Chat';
 
