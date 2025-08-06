@@ -8,8 +8,6 @@ import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken }
 import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const Chat = ({ route, navigation }) => {
-  // Safely destructure name and backgroundColor from route.params, providing default empty strings
-  // in case route.params is undefined.
   const { name = '', backgroundColor = '#048673' } = route.params || {};
 
   const [messages, setMessages] = useState([]);
