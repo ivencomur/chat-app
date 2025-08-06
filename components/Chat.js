@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { StyleSheet, View, Text, KeyboardAvoidingView, Platform } from 'react-native';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import 'react-native-safe-area-context';
 
 import { initializeApp } from 'firebase/app';
@@ -8,7 +8,7 @@ import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken }
 import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const Chat = ({ route, navigation }) => {
-  const { name, backgroundColor } = route.params;
+  const { name = '', backgroundColor = '#048673' } = route.params || {};
 
   const [messages, setMessages] = useState([]);
   const [db, setDb] = useState(null);
@@ -19,7 +19,7 @@ const Chat = ({ route, navigation }) => {
     
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null; 
 
     const app = initializeApp(firebaseConfig);
     const firestoreDb = getFirestore(app);
@@ -109,10 +109,10 @@ const Chat = ({ route, navigation }) => {
         {...props}
         wrapperStyle={{
           right: {
-            backgroundColor: "#000",
+            backgroundColor: "#048673",
           },
           left: {
-            backgroundColor: "#FFF",
+            backgroundColor: "#ffffff",
           }
         }}
       />
@@ -134,7 +134,7 @@ const Chat = ({ route, navigation }) => {
         showUserAvatar={true}
         renderUsernameOnMessage={true}
         renderChatFooter={() => (
-          Platform.OS === 'android' && <KeyboardAvoidingView behavior="height" />
+          Platform.OS === 'android' ? <View style={{ height: 20 }} /> : null
         )}
       />
       {Platform.OS === 'ios' && <KeyboardAvoidingView behavior="padding" />}
