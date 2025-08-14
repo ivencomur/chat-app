@@ -77,4 +77,9 @@ ios/Pods/
 coverage/
 
 # TypeScript
-*.tsbuildinfo
+*.tsbuildinfo# Firebase config
+firebase-config.js
+firebase-config.js
+.env
+.env.local
+*-config.js

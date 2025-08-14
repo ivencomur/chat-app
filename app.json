@@ -3,7 +3,7 @@
     "name": "Chat App",
     "slug": "chat-app",
     "version": "1.0.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": ["web", "ios", "android"],
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "splash": {
@@ -11,6 +11,7 @@
     },
     "web": {
       "bundler": "webpack"
-    }
+    },
+    "assetBundlePatterns": ["**/*"]
   }
 }
