@@ -1,88 +1,98 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TextInput,
-  TouchableOpacity, 
-  ScrollView,
-  Platform,
-  KeyboardAvoidingView
-} from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, View, Platform } from 'react-native';
+import { GiftedChat } from 'react-native-gifted-chat';
+import { collection, addDoc, query, orderBy, onSnapshot } from 'firebase/firestore';
 
-const Chat = ({ route, navigation }) => {
-  const { name = 'User', backgroundColor = '#048673' } = route.params || {};
+const Chat = ({ db, route, navigation }) => {
+  const { userID, name = 'User', theme = { 
+    name: 'Material Purple', 
+    primary: '#6200EE', 
+    secondary: '#3700B3', 
+    accent: '#BB86FC' 
+  }} = route.params || {};
+
   const [messages, setMessages] = useState([]);
-  const [inputText, setInputText] = useState('');
 
   useEffect(() => {
     navigation.setOptions({ 
-      title: `Chat - ${name}`,
-      headerStyle: { backgroundColor: backgroundColor },
-      headerTintColor: '#fff',
+      title: `${theme.name} • ${name}`,
+      headerStyle: { 
+        backgroundColor: theme.primary,
+      },
+      headerTintColor: '#FFFFFF',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
     });
 
-    // Add welcome message
-    setMessages([
-      {
-        id: 1,
-        text: `Welcome ${name}! 🎉 Your chat app is working perfectly on ${Platform.OS}!`,
-        user: 'System',
-        timestamp: new Date(),
-      }
-    ]);
-  }, [name, navigation, backgroundColor]);
+    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+    const unsubMessages = onSnapshot(q, (docs) => {
+      let newMessages = [];
+      docs.forEach(doc => {
+        const data = doc.data();
+        newMessages.push({
+          _id: doc.id,
+          text: data.text,
+          createdAt: data.createdAt ? new Date(data.createdAt.toMillis()) : new Date(),
+          user: data.user
+        });
+      });
+      setMessages(newMessages);
+    });
 
-  const sendMessage = useCallback(() => {
-    if (inputText.trim()) {
-      const newMessage = {
-        id: Date.now(),
-        text: inputText.trim(),
-        user: name,
-        timestamp: new Date(),
-      };
-      
-      setMessages(prev => [...prev, newMessage]);
-      setInputText('');
+    return () => {
+      if (unsubMessages) unsubMessages();
+    };
+  }, []);
+
+  const onSend = useCallback((newMessages = []) => {
+    if (newMessages.length > 0) {
+      addDoc(collection(db, "messages"), newMessages[0]);
     }
-  }, [inputText, name]);
+  }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: backgroundColor }]}>
-      <ScrollView style={styles.messagesContainer} contentContainerStyle={styles.messagesContent}>
-        {messages.map((message) => (
-          <View key={message.id} style={styles.messageItem}>
+    <View style={[styles.container, { backgroundColor: theme.secondary }]}>
+      <GiftedChat
+        messages={messages}
+        onSend={onSend}
+        user={{
+          _id: userID || 'default-user',
+          name: name
+        }}
+        renderBubble={(props) => {
+          const isCurrentUser = props.currentMessage.user._id === userID;
+          return (
             <View style={[
-              styles.messageBubble,
-              message.user === name ? styles.myMessage : styles.otherMessage
+              styles.bubble,
+              isCurrentUser ? 
+                [styles.rightBubble, { backgroundColor: theme.primary }] : 
+                styles.leftBubble
             ]}>
-              <Text style={styles.messageUser}>{message.user}</Text>
-              <Text style={styles.messageText}>{message.text}</Text>
-              <Text style={styles.messageTime}>
-                {message.timestamp.toLocaleTimeString()}
-              </Text>
+              <View style={styles.messageContent}>
+                {!isCurrentUser && (
+                  <View style={styles.userInfo}>
+                    <View style={styles.userName}>
+                      {props.children}
+                    </View>
+                  </View>
+                )}
+                <View style={styles.messageText}>
+                  {props.children}
+                </View>
+                <View style={styles.messageTime}>
+                  {props.children}
+                </View>
+              </View>
             </View>
-          </View>
-        ))}
-      </ScrollView>
-
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.inputContainer}
-      >
-        <TextInput
-          style={styles.textInput}
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="Type a message..."
-          placeholderTextColor="#999"
-          onSubmitEditing={sendMessage}
-          returnKeyType="send"
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-          <Text style={styles.sendButtonText}>Send</Text>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
+          );
+        }}
+        placeholder="Type a message..."
+        alwaysShowSend
+        showUserAvatar={false}
+        scrollToBottom
+        scrollToBottomStyle={{ backgroundColor: theme.primary }}
+      />
     </View>
   );
 };
@@ -91,71 +101,41 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  messagesContainer: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  messagesContent: {
+  bubble: {
     padding: 10,
-  },
-  messageItem: {
-    marginVertical: 5,
-  },
-  messageBubble: {
-    padding: 12,
-    borderRadius: 12,
+    marginVertical: 2,
+    marginHorizontal: 10,
+    borderRadius: 15,
     maxWidth: '80%',
   },
-  myMessage: {
-    backgroundColor: '#007AFF',
+  rightBubble: {
     alignSelf: 'flex-end',
+    borderBottomRightRadius: 5,
   },
-  otherMessage: {
-    backgroundColor: '#E5E5EA',
+  leftBubble: {
+    backgroundColor: '#FFFFFF',
     alignSelf: 'flex-start',
+    borderBottomLeftRadius: 5,
   },
-  messageUser: {
-    fontSize: 12,
+  messageContent: {
+    flex: 1,
+  },
+  userInfo: {
+    marginBottom: 2,
+  },
+  userName: {
     fontWeight: 'bold',
-    marginBottom: 4,
+    fontSize: 12,
     color: '#666',
   },
   messageText: {
     fontSize: 16,
-    color: '#000',
-    marginBottom: 4,
+    lineHeight: 20,
   },
   messageTime: {
     fontSize: 10,
-    color: '#666',
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    padding: 10,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-  },
-  textInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginRight: 10,
-    fontSize: 16,
-  },
-  sendButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    justifyContent: 'center',
-  },
-  sendButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#999',
+    marginTop: 2,
   },
 });
 

@@ -15,17 +15,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 
-// Import Firebase configuration
-import { auth, db } from '../firebase-config';
+import { auth, db } from './firebase-config';
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { 
   collection, 
   query, 
   orderBy, 
-  onSnapshot, 
-  addDoc, 
-  serverTimestamp 
-} from 'firebase/firestore';
   onSnapshot, 
   addDoc, 
   serverTimestamp 
@@ -41,7 +36,6 @@ const Chat = ({ route, navigation }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data for when Firebase is not configured
   const createMockMessages = useCallback(() => [
     {
       _id: Math.round(Math.random() * 1000000),
@@ -69,7 +63,6 @@ const Chat = ({ route, navigation }) => {
 
   const initializeChat = async () => {
     try {
-      // Initialize Firebase authentication
       await signInAnonymously(auth);
       
       const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -88,7 +81,6 @@ const Chat = ({ route, navigation }) => {
       return () => unsubscribeAuth();
     } catch (error) {
       console.error("Error initializing chat:", error);
-      // Fallback to local mode
       setMessages(createMockMessages());
       setUserId('fallback-user-' + Math.random().toString(36).substring(7));
       setIsConnected(false);
@@ -139,7 +131,6 @@ const Chat = ({ route, navigation }) => {
     const messageToSend = newMessages[0];
     
     if (isConnected) {
-      // Send to Firebase
       try {
         await addDoc(collection(db, 'messages'), {
           text: messageToSend.text || null,
@@ -157,7 +148,6 @@ const Chat = ({ route, navigation }) => {
         setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages));
       }
     } else {
-      // Update local state only
       setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages));
     }
   }, [userId, name, isConnected]);
@@ -234,7 +224,7 @@ const Chat = ({ route, navigation }) => {
       );
     }
     
-    return null; // Let GiftedChat handle regular text
+    return null;
   };
 
   const showActionSheet = useCallback(() => {
@@ -379,7 +369,7 @@ const Chat = ({ route, navigation }) => {
           />
         </View>
         
-        {!isConnected && (
+        {isConnected && (
           <View style={styles.offlineIndicator}>
             <Text style={styles.offlineText}>
               🔥 Firebase Connected - Real-time chat enabled!
