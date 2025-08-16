@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Platform } from 'react-native';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { GiftedChat, InputToolbar } from 'react-native-gifted-chat';
 import { collection, addDoc, query, orderBy, onSnapshot } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Chat = ({ db, route, navigation }) => {
+const Chat = ({ db, route, navigation, isConnected }) => {
   const { userID, name = 'User', theme = { 
     name: 'Material Purple', 
     primary: '#6200EE', 
@@ -12,6 +13,7 @@ const Chat = ({ db, route, navigation }) => {
   }} = route.params || {};
 
   const [messages, setMessages] = useState([]);
+  let unsubMessages;
 
   useEffect(() => {
     navigation.setOptions({ 
@@ -25,31 +27,63 @@ const Chat = ({ db, route, navigation }) => {
       },
     });
 
-    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
-    const unsubMessages = onSnapshot(q, (docs) => {
-      let newMessages = [];
-      docs.forEach(doc => {
-        const data = doc.data();
-        newMessages.push({
-          _id: doc.id,
-          text: data.text,
-          createdAt: data.createdAt ? new Date(data.createdAt.toMillis()) : new Date(),
-          user: data.user
+    if (isConnected === true) {
+      if (unsubMessages) unsubMessages();
+      unsubMessages = null;
+      const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+      unsubMessages = onSnapshot(q, async (docs) => {
+        let newMessages = [];
+        docs.forEach(doc => {
+          const data = doc.data();
+          newMessages.push({
+            _id: doc.id,
+            text: data.text,
+            createdAt: data.createdAt ? new Date(data.createdAt.toMillis()) : new Date(),
+            user: data.user
+          });
         });
+        setMessages(newMessages);
+        try {
+            await AsyncStorage.setItem('chat_messages', JSON.stringify(newMessages));
+        } catch (error) {
+            console.error('Error caching messages:', error);
+        }
       });
-      setMessages(newMessages);
-    });
+    } else {
+        const loadCachedMessages = async () => {
+            try {
+                const cachedMessages = await AsyncStorage.getItem('chat_messages');
+                if (cachedMessages !== null) {
+                    setMessages(JSON.parse(cachedMessages));
+                } else {
+                    setMessages([]);
+                }
+            } catch (error) {
+                console.error('Error loading cached messages:', error);
+                setMessages([]);
+            }
+        };
+        loadCachedMessages();
+    }
 
     return () => {
       if (unsubMessages) unsubMessages();
     };
-  }, []);
+  }, [isConnected]);
 
   const onSend = useCallback((newMessages = []) => {
     if (newMessages.length > 0) {
       addDoc(collection(db, "messages"), newMessages[0]);
     }
   }, []);
+
+  const renderInputToolbar = (props) => {
+    if (isConnected) {
+      return <InputToolbar {...props} />;
+    } else {
+      return null;
+    }
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.secondary }]}>
@@ -92,6 +126,7 @@ const Chat = ({ db, route, navigation }) => {
         showUserAvatar={false}
         scrollToBottom
         scrollToBottomStyle={{ backgroundColor: theme.primary }}
+        renderInputToolbar={renderInputToolbar}
       />
     </View>
   );
