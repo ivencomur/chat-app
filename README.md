@@ -327,6 +327,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Made with ❤️ using React Native, Expo & Firebase**
+**Made using React Native, Expo & Firebase**
 
 *Optimized for Windows, macOS, Linux, iOS, Android, and Web*
