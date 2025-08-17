@@ -5,11 +5,13 @@ import { StatusBar } from 'expo-status-bar';
 import { LogBox, View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useNetInfo } from '@react-native-community/netinfo';
 import { disableNetwork, enableNetwork } from 'firebase/firestore';
-import { db } from './firebase-config';
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 import Start from './Start';
 import Chat from './Chat';
+import { firebaseConfig } from './firebase-config';
 
-// Ignore common warnings that don't affect functionality
+
 LogBox.ignoreLogs([
   'AsyncStorage has been extracted',
   '@firebase/auth',
@@ -22,37 +24,33 @@ LogBox.ignoreLogs([
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  // EXERCISE 5.4 STEP 1: Real-time network connectivity detection
   const connectionStatus = useNetInfo();
   const [isInitialized, setIsInitialized] = useState(false);
   const [networkMessage, setNetworkMessage] = useState('');
 
-  // Initialize app after a brief delay for better UX
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
   useEffect(() => {
     const timer = setTimeout(() => setIsInitialized(true), 1000);
     return () => clearTimeout(timer);
   }, []);
 
-  // EXERCISE 5.4 STEP 1: Handle network status changes
   useEffect(() => {
     if (!isInitialized) return;
 
     if (connectionStatus.isConnected === false) {
       setNetworkMessage('📱 Offline Mode - Reading cached messages');
-      // EXERCISE 5.4 STEP 1: Disable Firestore when offline
       disableNetwork(db).catch(console.error);
     } else if (connectionStatus.isConnected === true) {
       setNetworkMessage('🌐 Online - Syncing messages');
-      // EXERCISE 5.4 STEP 1: Enable Firestore when online
       enableNetwork(db).catch(console.error);
     }
     
-    // Clear network message after showing it briefly
     const timer = setTimeout(() => setNetworkMessage(''), 3000);
     return () => clearTimeout(timer);
   }, [connectionStatus.isConnected, isInitialized]);
 
-  // Show loading screen during initialization
   if (!isInitialized) {
     return (
       <View style={styles.loadingContainer}>
@@ -65,7 +63,6 @@ export default function App() {
   return (
     <NavigationContainer>
       <StatusBar style="light" />
-      {/* Display network status banner */}
       {networkMessage ? (
         <View style={[
           styles.networkBanner,
@@ -81,7 +78,6 @@ export default function App() {
           component={Start}
           options={{ headerShown: false }}
         />
-        {/* EXERCISE 5.4 STEP 1: Pass isConnected prop to Chat component */}
         <Stack.Screen name="Chat">
           {props => (
             <Chat
@@ -94,6 +90,7 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
   );
+
 }
 
 const styles = StyleSheet.create({
