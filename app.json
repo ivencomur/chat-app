@@ -2,15 +2,25 @@
   "expo": {
     "name": "Chat App",
     "slug": "chat-app",
-    "version": "1.0.0",
-    "platforms": ["ios", "android", "web"],
+    "version": "5.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "splash": {
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#6200EE"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.chatapp.exercise"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#6200EE"
+      },
+      "package": "com.chatapp.exercise"
     },
     "web": {
-      "bundler": "webpack"
+      "bundler": "metro"
     }
   }
 }
