@@ -1,91 +1,17 @@
-# Dependencies
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Expo
 .expo/
-dist/
-web-build/
-expo-env.d.ts
-
-# Metro
+.expo-shared/
 .metro-cache/
-
-# Native
-*.orig.*
+dist/
+npm-debug.*
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
-
-# macOS
+*.orig.*
+web-build/
 .DS_Store
-
-# Temporary files created by Metro to check the health of the file watcher
-.metro-health-check*
-
-# Firebase
-firebase-config.js
-.firebase/
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Logs
-logs
 *.log
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS generated files
-Thumbs.db
-
-# Xcode
-*.xcodeproj
-*.xcworkspace
-*.pbxuser
-*.perspectivev3
-xcuserdata
-
-# Android
-*.apk
-*.aab
-android/app/build/
-android/.gradle/
-
-# iOS
-ios/build/
-ios/Pods/
-*.ipa
-
-# Cache
-.cache/
-.parcel-cache/
-
-# Coverage
-coverage/
-
-# TypeScript
-*.tsbuildinfo# Firebase config
-firebase-config.js
-
-# Firebase configuration
-firebase-config.js
-
-# Environment variables
-.env
-.env.local
-
-# Sensitive files
-*-config.js
+package-lock.json
+yarn.lock
