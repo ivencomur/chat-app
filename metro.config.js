@@ -6,7 +6,7 @@ const config = getDefaultConfig(__dirname);
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName === 'idb' || moduleName.includes('idb')) {
     return {
-      filePath: path.resolve(__dirname, 'idb-stub.js'),
+      filePath: path.resolve(__dirname, 'empty-module.js'),
       type: 'sourceFile',
     };
   }

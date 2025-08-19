@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Chat App",
-    "slug": "chat-app",
-    "version": "5.0.0",
+    "name": "Exercise 5.5 Complete",
+    "slug": "exercise-5-5-complete",
+    "version": "5.5.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -11,16 +11,28 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.chatapp.exercise"
+      "bundleIdentifier": "com.exercise55.complete",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses camera to take photos for sharing in chat",
+        "NSPhotoLibraryUsageDescription": "This app accesses photo library to share images in chat",
+        "NSLocationWhenInUseUsageDescription": "This app uses location to share your location in chat"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#6200EE"
       },
-      "package": "com.chatapp.exercise"
+      "package": "com.exercise55.complete",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
     }
   }
 }

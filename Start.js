@@ -23,7 +23,7 @@ export default function Start({ navigation }) {
   const [selectedTheme, setSelectedTheme] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Exactly 5 themes as requested
+  // 5 beautiful themes for Exercise 5.4/5.5
   const themes = [
     { name: 'Material Purple', primary: '#6200EE', secondary: '#3700B3', accent: '#BB86FC' },
     { name: 'Ocean Blue', primary: '#0277BD', secondary: '#01579B', accent: '#4FC3F7' },
@@ -69,7 +69,7 @@ export default function Start({ navigation }) {
         >
           <View style={styles.header}>
             <Text style={styles.title}>💬 Chat App</Text>
-            <Text style={styles.subtitle}>Exercise 5.4 • Offline Ready</Text>
+            <Text style={styles.subtitle}>Exercise 5.5 • Complete Features</Text>
           </View>
 
           <View style={styles.formContainer}>
@@ -130,106 +130,21 @@ export default function Start({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
-    minHeight: height - 100,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: width > 400 ? 48 : 36,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
-  },
-  formContainer: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: 20,
-    padding: 24,
-    maxWidth: 500,
-    width: '100%',
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: '#F5F5F5',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 12,
-    padding: 14,
-    fontSize: 16,
-    marginBottom: 24,
-  },
-  themeScroll: {
-    marginBottom: 24,
-    maxHeight: 100,
-  },
-  themeCard: {
-    width: 90,
-    height: 80,
-    borderRadius: 12,
-    marginRight: 10,
-    padding: 8,
-    justifyContent: 'space-between',
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  selectedTheme: {
-    borderColor: '#000',
-    transform: [{ scale: 1.05 }],
-  },
-  themePreview: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginLeft: 4,
-  },
-  themeName: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  button: {
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
+  container: { flex: 1 },
+  keyboardView: { flex: 1 },
+  scrollContent: { flexGrow: 1, justifyContent: 'center', padding: 20, minHeight: height - 100 },
+  header: { alignItems: 'center', marginBottom: 30 },
+  title: { fontSize: width > 400 ? 48 : 36, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 8 },
+  subtitle: { fontSize: 16, color: 'rgba(255,255,255,0.9)' },
+  formContainer: { backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 20, padding: 24, maxWidth: 500, width: '100%', alignSelf: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 8 },
+  label: { fontSize: 16, fontWeight: '600', color: '#333', marginBottom: 8 },
+  input: { backgroundColor: '#F5F5F5', borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 12, padding: 14, fontSize: 16, marginBottom: 24 },
+  themeScroll: { marginBottom: 24, maxHeight: 100 },
+  themeCard: { width: 90, height: 80, borderRadius: 12, marginRight: 10, padding: 8, justifyContent: 'space-between', borderWidth: 2, borderColor: 'transparent' },
+  selectedTheme: { borderColor: '#000', transform: [{ scale: 1.05 }] },
+  themePreview: { flexDirection: 'row', justifyContent: 'flex-end' },
+  dot: { width: 10, height: 10, borderRadius: 5, marginLeft: 4 },
+  themeName: { fontSize: 10, fontWeight: '600', color: '#FFFFFF' },
+  button: { borderRadius: 12, padding: 16, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 4 },
+  buttonText: { fontSize: 18, fontWeight: 'bold', color: '#FFFFFF' },
 });
