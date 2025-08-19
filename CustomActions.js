@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, Alert } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet, Alert, Platform } from 'react-native';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
@@ -33,13 +33,25 @@ const CustomActions = ({ onSend, userID }) => {
       }
     } catch (error) {
       console.error('Image picker error:', error);
-      Alert.alert('Error', 'Failed to pick image. Please try again.');
+      if (Platform.OS === 'web') {
+        Alert.alert('Web Limitation', 'Image picker has limited support on web. Please try on mobile for full functionality.');
+      } else {
+        Alert.alert('Error', 'Failed to pick image. Please try again.');
+      }
     }
   };
 
   const takePhoto = async () => {
     try {
-      // Request permissions
+      if (Platform.OS === 'web') {
+        Alert.alert(
+          'Web Limitation', 
+          'Camera capture is not available on web. Please use "Choose From Library" instead, or try on mobile for full camera functionality.'
+        );
+        return;
+      }
+
+      // Request permissions (mobile only)
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission Required', 'Sorry, we need camera permissions to take photos!');
@@ -68,14 +80,41 @@ const CustomActions = ({ onSend, userID }) => {
 
   const getLocation = async () => {
     try {
-      // Request permissions
+      if (Platform.OS === 'web') {
+        // Web geolocation API
+        if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              onSend([{
+                _id: Math.round(Math.random() * 1000000),
+                createdAt: new Date(),
+                user: { _id: userID },
+                text: 'Location shared',
+                location: {
+                  longitude: position.coords.longitude,
+                  latitude: position.coords.latitude,
+                },
+              }]);
+            },
+            (error) => {
+              console.error('Web geolocation error:', error);
+              Alert.alert('Location Error', 'Failed to get location. Please allow location access in your browser.');
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+          );
+        } else {
+          Alert.alert('Not Supported', 'Geolocation is not supported by this browser.');
+        }
+        return;
+      }
+
+      // Mobile location (Expo Location)
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission Required', 'Sorry, we need location permissions to share your location!');
         return;
       }
 
-      // Get current location
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
@@ -99,29 +138,33 @@ const CustomActions = ({ onSend, userID }) => {
   };
 
   const onActionPress = () => {
-    const options = ['Choose From Library', 'Take Picture', 'Send Location', 'Cancel'];
-    const cancelButtonIndex = 3;
+    // Different options for web vs mobile
+    const options = Platform.OS === 'web' 
+      ? ['Choose From Library', 'Send Location', 'Cancel']
+      : ['Choose From Library', 'Take Picture', 'Send Location', 'Cancel'];
+    
+    const cancelButtonIndex = options.length - 1;
     
     showActionSheetWithOptions(
       { 
         options, 
         cancelButtonIndex,
-        title: 'Communication Features'
+        title: Platform.OS === 'web' ? 'Communication Features (Web)' : 'Communication Features'
       },
       (buttonIndex) => {
-        switch (buttonIndex) {
-          case 0: 
-            pickImage(); 
-            break;
-          case 1: 
-            takePhoto(); 
-            break;
-          case 2: 
-            getLocation(); 
-            break;
-          default:
-            // Cancel - do nothing
-            break;
+        if (Platform.OS === 'web') {
+          switch (buttonIndex) {
+            case 0: pickImage(); break;
+            case 1: getLocation(); break;
+            default: break;
+          }
+        } else {
+          switch (buttonIndex) {
+            case 0: pickImage(); break;
+            case 1: takePhoto(); break;
+            case 2: getLocation(); break;
+            default: break;
+          }
         }
       }
     );
