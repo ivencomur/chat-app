@@ -19,13 +19,13 @@ if (Platform.OS !== 'web') {
 }
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBAFQtuqjFeJmr2sAfBQ4TN4qojLfrXjOg",
-  authDomain: "my-chat-app-project-careerfoun.firebaseapp.com",
-  projectId: "my-chat-app-project-careerfoun",
-  storageBucket: "my-chat-app-project-careerfoun.firebasestorage.app",
-  messagingSenderId: "781458415749",
-  appId: "1:781458415749:web:9cfb9ce3a86aa45b0889ec",
-  measurementId: "G-B6YM9DCL3Q"
+  apiKey: process.env.EXPO_PUBLIC_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_APP_ID,
+  measurementId: process.env.EXPO_PUBLIC_MEASUREMENT_ID
 };
 
 let app, auth, db;
