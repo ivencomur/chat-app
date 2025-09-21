@@ -4,40 +4,56 @@ import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 
+// Helper function to convert file URI to Base64 for web
+const uriToDataURL = (uri) => {
+  return new Promise((resolve, reject) => {
+    fetch(uri)
+      .then(response => response.blob())
+      .then(blob => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      })
+      .catch(reject);
+  });
+};
+
 const CustomActions = ({ onSend, userID }) => {
   const { showActionSheetWithOptions } = useActionSheet();
 
   const pickImage = async () => {
     try {
-      // Request permissions
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission Required', 'Sorry, we need camera roll permissions to share photos!');
         return;
       }
 
-      // Launch image picker
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 0.8,
       });
       
       if (!result.canceled && result.assets && result.assets[0]) {
+        let imageUri = result.assets[0].uri;
+
+        // On web, convert the local file URI to a Base64 Data URL so it can be displayed.
+        if (Platform.OS === 'web') {
+          imageUri = await uriToDataURL(imageUri);
+        }
+
         onSend([{
           _id: Math.round(Math.random() * 1000000),
           createdAt: new Date(),
           user: { _id: userID },
-          image: result.assets[0].uri,
+          image: imageUri,
           text: '',
         }]);
       }
     } catch (error) {
       console.error('Image picker error:', error);
-      if (Platform.OS === 'web') {
-        Alert.alert('Web Limitation', 'Image picker has limited support on web. Please try on mobile for full functionality.');
-      } else {
-        Alert.alert('Error', 'Failed to pick image. Please try again.');
-      }
+      Alert.alert('Error', 'Failed to pick image. Please try again.');
     }
   };
 
@@ -46,19 +62,17 @@ const CustomActions = ({ onSend, userID }) => {
       if (Platform.OS === 'web') {
         Alert.alert(
           'Web Limitation', 
-          'Camera capture is not available on web. Please use "Choose From Library" instead, or try on mobile for full camera functionality.'
+          'Camera capture is not available on web. Please use "Choose From Library" instead.'
         );
         return;
       }
 
-      // Request permissions (mobile only)
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission Required', 'Sorry, we need camera permissions to take photos!');
         return;
       }
 
-      // Launch camera
       let result = await ImagePicker.launchCameraAsync({
         quality: 0.8,
       });
@@ -80,44 +94,13 @@ const CustomActions = ({ onSend, userID }) => {
 
   const getLocation = async () => {
     try {
-      if (Platform.OS === 'web') {
-        // Web geolocation API
-        if ('geolocation' in navigator) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              onSend([{
-                _id: Math.round(Math.random() * 1000000),
-                createdAt: new Date(),
-                user: { _id: userID },
-                text: 'Location shared',
-                location: {
-                  longitude: position.coords.longitude,
-                  latitude: position.coords.latitude,
-                },
-              }]);
-            },
-            (error) => {
-              console.error('Web geolocation error:', error);
-              Alert.alert('Location Error', 'Failed to get location. Please allow location access in your browser.');
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-          );
-        } else {
-          Alert.alert('Not Supported', 'Geolocation is not supported by this browser.');
-        }
-        return;
-      }
-
-      // Mobile location (Expo Location)
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission Required', 'Sorry, we need location permissions to share your location!');
         return;
       }
 
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
+      const location = await Location.getCurrentPositionAsync({});
       
       if (location) {
         onSend([{
@@ -138,7 +121,6 @@ const CustomActions = ({ onSend, userID }) => {
   };
 
   const onActionPress = () => {
-    // Different options for web vs mobile
     const options = Platform.OS === 'web' 
       ? ['Choose From Library', 'Send Location', 'Cancel']
       : ['Choose From Library', 'Take Picture', 'Send Location', 'Cancel'];
@@ -149,7 +131,6 @@ const CustomActions = ({ onSend, userID }) => {
       { 
         options, 
         cancelButtonIndex,
-        title: Platform.OS === 'web' ? 'Communication Features (Web)' : 'Communication Features'
       },
       (buttonIndex) => {
         if (Platform.OS === 'web') {
