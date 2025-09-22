@@ -65,7 +65,7 @@ export default function Start({ navigation }) {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.header}>
             <Text style={styles.title}>💬 Chat App</Text>
-            <Text style={styles.subtitle}>Join a Temporary Chat</Text>
+            <Text style={styles.subtitle}>Let´s join a Temporary Chat!</Text>
           </View>
 
           <View style={styles.formContainer}>
